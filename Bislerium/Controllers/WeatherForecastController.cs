@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bislerium.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize(Roles="Admin")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
@@ -17,7 +19,7 @@ namespace Bislerium.Controllers
         {
             _logger = logger;
         }
-
+       
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
@@ -29,5 +31,6 @@ namespace Bislerium.Controllers
             })
             .ToArray();
         }
+        
     }
 }

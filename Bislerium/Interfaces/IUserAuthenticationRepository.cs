@@ -9,5 +9,7 @@ namespace Bislerium.Interfaces
         Task<IdentityResult> RegisterUserAsync(UserRegistrationDto userForRegistration);
         Task<bool> ValidateUserAsync(UserLoginDto loginDto);
         Task<string> CreateTokenAsync();
+
+        string GetCurrentUserId();
     }
 }

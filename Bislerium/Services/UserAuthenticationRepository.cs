@@ -4,6 +4,7 @@ using Bislerium.Interfaces;
 using Bislerium.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -17,13 +18,16 @@ namespace Bislerium.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private User? _user;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         public UserAuthenticationRepository(
-        UserManager<User> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        UserManager<User> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager, IConfiguration configuration,IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _mapper = mapper;
             _roleManager = roleManager;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
              
 
     }
@@ -44,7 +48,7 @@ namespace Bislerium.Services
         {
             if (!await _roleManager.RoleExistsAsync(roleName))
             {
-                throw new InvalidOperationException($"The role '{roleName}' does not exist.");
+                 throw new InvalidOperationException($"The role '{roleName}' does not exist.");
             }
 
             await _userManager.AddToRoleAsync(user, roleName);
@@ -76,7 +80,8 @@ namespace Bislerium.Services
         {
             var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, _user.UserName)
+            new Claim(ClaimTypes.Name, _user.UserName),
+            new Claim(ClaimTypes.NameIdentifier, _user.Id)
         };
             var roles = await _userManager.GetRolesAsync(_user);
             foreach (var role in roles)
@@ -98,6 +103,24 @@ namespace Bislerium.Services
             signingCredentials: signingCredentials
             );
             return tokenOptions;
+        }
+
+        public string GetCurrentUserId()
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+           
+            if (httpContext != null)
+            {
+                
+                var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userId != null)
+                    return userId;
+            }
+        
+            
+
+            return "Hello";
+            
         }
 
 

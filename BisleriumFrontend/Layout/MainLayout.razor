@@ -1,0 +1,131 @@
+﻿@* NOTE: client-side MainLayout.razor *@
+@inherits LayoutComponentBase
+
+@* NOTE: BEGIN NEW CODE *@
+@inject Utilities.ILocalStorage LocalStorage
+@inject NavigationManager Nav
+
+<CascadingValue Value="this">
+@* NOTE: END NEW CODE *@
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+
+
+			@* NOTE: BEGIN NEW CODE (REPLACED THE "About" LINK) *@
+			<div style="width:70px;text-align:right;display:flex;">
+				@if (loggedIn)
+				{
+					<button class="btn btn-sm btn-primary m-1" title="Account" @onclick="GoToAccount"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-key-fill" viewBox="0 0 16 16"><path d="M3.5 11.5a3.5 3.5 0 1 1 3.163-5H14L15.5 8 14 9.5l-1-1-1 1-1-1-1 1-1-1-1 1H6.663a3.5 3.5 0 0 1-3.163 2zM2.5 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" /></svg></button>
+					<button class="btn btn-sm btn-danger m-1" title="Logout" @onclick="Logout"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0v2z" /><path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z" /></svg></button>
+				}
+				else
+				{
+					<button class="btn btn-sm btn-success m-1" title="Login" @onclick="OpenLogin"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0v-2z" /><path fill-rule="evenodd" d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z" /></svg></button>
+				}
+			</div>
+			@* NOTE: END NEW CODE *@
+
+
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@* NOTE: BEGIN NEW CODE *@
+</CascadingValue>
+
+<div class="modal-backdrop fade @(show ? "show" : "") @(display ? "d-block" : "d-none")"></div>
+
+<div class="modal fade @(show ? "show" : "")  @(display ? "d-block" : "d-none")" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Login Form</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<label for="loginEmail" class="form-label">Email</label>
+					<input type="email" class="form-control" id="loginEmail" placeholder="name@example.com" autocomplete="off" required @bind-value="user" />
+				</div>
+				<div class="mb-3">
+					<label for="loginPassword" class="form-label">Password</label>
+					<input type="password" class="form-control" id="loginPassword" required @bind-value="password" />
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-success" @onclick="Login">Login</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="Close">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+
+	private bool show, display, loggedIn;
+	private string? user, password;
+
+	public string? GetUserName()
+	{
+		return loggedIn ? user : null;
+	}
+
+	public async Task OpenLogin()
+	{
+		display = true;
+		await Task.Delay(100);
+		show = true;
+	}
+
+	public async Task Logout()
+	{
+		user = null;
+		loggedIn = false;
+		await LocalStorage.RemoveAsync("user");
+	}
+
+	private async Task Close()
+	{
+		show = false;
+		await Task.Delay(500);
+		display = false;
+	}
+
+	private async Task Login()
+	{
+		if (!string.IsNullOrEmpty(user) && !string.IsNullOrWhiteSpace(password))
+		{
+			// NOTE: Check password here!!
+			await Close();
+			loggedIn = true;
+			password = null;
+			await LocalStorage.SaveStringAsync("user", user);
+		}
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		user = await LocalStorage.GetStringAsync("user");
+		loggedIn = !string.IsNullOrEmpty(user);
+	}
+
+	private void GoToAccount()
+	{
+		Nav.NavigateTo("/account");
+	}
+}
+
+@* NOTE: END NEW CODE *@

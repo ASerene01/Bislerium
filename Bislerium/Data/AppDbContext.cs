@@ -17,7 +17,8 @@ namespace Bislerium.Data
         public DbSet<Comment> Comments { get; set; }
 
         public DbSet<Reaction> Reactions { get; set; }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+		public DbSet<User> Users { get; set; }
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 

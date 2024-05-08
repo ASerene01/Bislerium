@@ -10,11 +10,13 @@ namespace Bislerium.Models
         public bool Upvote { get; set; } = false;
         public bool Downvote { get; set; } = false;
 
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public string? UserId { get; set; }
         public User? User { get; set; }
 
         public int? BlogId { get; set; }
         public Blog? Blog { get; set; }
+
 
 
     }

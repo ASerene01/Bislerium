@@ -12,6 +12,7 @@ using NuGet.Protocol.Core.Types;
 using AutoMapper;
 using Bislerium.Interfaces;
 using Bislerium.Services;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 namespace Bislerium.Controllers
 {
@@ -35,8 +36,27 @@ namespace Bislerium.Controllers
             return await _context.Blog.ToListAsync();
         }
 
-        // GET: api/Blogs/5
-        [HttpGet("{id}")]
+		// GET: api/Blogs
+		[HttpGet("/currentUserBlogs")]
+        
+		public async Task<ActionResult<IEnumerable<Blog>>> GetCurrentUsersBlog()
+		{
+			string getCurrentUserId = _repository.UserAuthentication.GetCurrentUserId();
+			var blogs = await _context.Blog
+			   .Where(c => c.BloggerId == getCurrentUserId)
+			   .ToListAsync();
+
+			if (blogs == null || blogs.Count == 0)
+			{
+				return NotFound();
+			}
+
+			return blogs;
+			
+		}
+
+		// GET: api/Blogs/5
+		[HttpGet("{id}")]
         public async Task<ActionResult<Blog>> GetBlog(int id)
         {
             var blog = await _context.Blog.FindAsync(id);
@@ -177,7 +197,7 @@ namespace Bislerium.Controllers
 
                 // Upvote the blog
                 newReaction.Upvote=true;
-                
+                newReaction.CreatedAt= DateTime.Now;
                 // Add the new Reaction to DbContext and save changes
                 _context.Reactions.Add(newReaction);
             }
@@ -192,7 +212,8 @@ namespace Bislerium.Controllers
                 {
                     // If user previously downvoted or had no reaction, toggle on the upvote
                     existingReaction.Upvote = true;
-                    existingReaction.Downvote = false; // Reset downvote if applicable
+					newReaction.CreatedAt = DateTime.Now;
+					existingReaction.Downvote = false; // Reset downvote if applicable
                 }
             }
 
@@ -227,9 +248,10 @@ namespace Bislerium.Controllers
 
                 // Upvote the blog
                 newReaction.Downvote = true;
+				newReaction.CreatedAt = DateTime.Now;
 
-                // Add the new Reaction to DbContext and save changes
-                _context.Reactions.Add(newReaction);
+				// Add the new Reaction to DbContext and save changes
+				_context.Reactions.Add(newReaction);
             }
             else
             {
@@ -242,7 +264,8 @@ namespace Bislerium.Controllers
                 {
                     // If user previously downvoted or had no reaction, toggle on the upvote
                     existingReaction.Downvote = true;
-                    existingReaction.Upvote = false; // Reset downvote if applicable
+					newReaction.CreatedAt = DateTime.Now;
+					existingReaction.Upvote = false; // Reset downvote if applicable
                 }
             }
 

@@ -1,7 +1,9 @@
 using Bislerium.Constants;
 using Bislerium.Data;
 using Bislerium.Extensions;
+using Bislerium.Interfaces;
 using Bislerium.Models;
+using Bislerium.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +23,7 @@ builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
 builder.Services.ConfigureMapping();
 builder.Services.ConfigureRepositoryManager();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.ConfigureJWT(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 
@@ -32,7 +35,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", builder =>
     {
-        builder.WithOrigins("http://localhost:3000/")
+        builder.WithOrigins("http://localhost:3000")
                .AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials();

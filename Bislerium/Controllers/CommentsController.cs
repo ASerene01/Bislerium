@@ -10,6 +10,7 @@ using Bislerium.Models;
 
 using NuGet.Protocol.Core.Types;
 using Bislerium.Interfaces;
+using Bislerium.Services;
 
 namespace Bislerium.Controllers
 {
@@ -76,9 +77,106 @@ namespace Bislerium.Controllers
             return NoContent();
         }
 
-        private bool CommentExists(int id)
+		[HttpPost("{commentId}/downvote")]
+		public async Task<ActionResult> Downvote(int commentId)
+		{
+			// Call the method to add the comment to the blog
+			// Retrieve the blog from the database
+			var blog = await _context.Comments.FindAsync(commentId);
+			string getCurrentUserId = _repository.UserAuthentication.GetCurrentUserId();
+			var existingReaction = _context.CommentReactions.FirstOrDefault(r => r.UserId == getCurrentUserId && r.CommentId == commentId);
+			// Create a new Reaction
+			var newReaction = new CommentReaction
+			{
+				UserId = getCurrentUserId,
+				CommentId = commentId
+			};
+			if (existingReaction == null)
+			{
+
+
+				// Upvote the blog
+				newReaction.Downvote = true;
+				newReaction.CreatedAt = DateTime.Now;
+
+				// Add the new Reaction to DbContext and save changes
+				_context.CommentReactions.Add(newReaction);
+			}
+			else
+			{
+				if (existingReaction.Downvote)
+				{
+					// If user previously upvoted, toggle off the upvote
+					existingReaction.Downvote = false;
+				}
+				else
+				{
+					// If user previously downvoted or had no reaction, toggle on the upvote
+					existingReaction.Downvote = true;
+					existingReaction.CreatedAt = DateTime.Now;
+					existingReaction.Upvote = false; // Reset downvote if applicable
+				}
+			}
+
+		
+			// Save changes to persist the new comment in the database
+			await _context.SaveChangesAsync();
+
+			return Ok(); // Return 200 OK if the comment was added successfully
+		}
+
+		[HttpPost("{commentId}/upvote")]
+		public async Task<ActionResult> Upvote(int commentId)
+		{
+			// Call the method to add the comment to the blog
+			// Retrieve the blog from the database
+			var blog = await _context.Comments.FindAsync(commentId);
+			string getCurrentUserId = _repository.UserAuthentication.GetCurrentUserId();
+			var existingReaction = _context.CommentReactions.FirstOrDefault(r => r.UserId == getCurrentUserId && r.CommentId == commentId);
+			// Create a new Reaction
+			var newReaction = new CommentReaction
+			{
+				UserId = getCurrentUserId,
+				CommentId = commentId
+			};
+			if (existingReaction == null)
+			{
+
+
+				// Upvote the blog
+				newReaction.Upvote = true;
+				newReaction.CreatedAt = DateTime.Now;
+				// Add the new Reaction to DbContext and save changes
+				_context.CommentReactions.Add(newReaction);
+			}
+			else
+			{
+				if (existingReaction.Upvote)
+				{
+					// If user previously upvoted, toggle off the upvote
+					existingReaction.Upvote = false;
+				}
+				else
+				{
+					// If user previously downvoted or had no reaction, toggle on the upvote
+					existingReaction.Upvote = true;
+					existingReaction.CreatedAt = DateTime.Now;
+					existingReaction.Downvote = false; // Reset downvote if applicable
+				}
+			}
+
+			
+
+			// Save changes to persist the new comment in the database
+			await _context.SaveChangesAsync();
+
+			return Ok(); // Return 200 OK if the comment was added successfully
+		}
+
+		private bool CommentExists(int id)
         {
             return _context.Comments.Any(e => e.CommentId == id);
         }
     }
 }
+	

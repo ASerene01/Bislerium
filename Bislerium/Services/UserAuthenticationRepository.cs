@@ -4,6 +4,7 @@ using Bislerium.Interfaces;
 using Bislerium.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using NuGet.Protocol.Core.Types;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -20,14 +21,17 @@ namespace Bislerium.Services
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserAuthenticationRepository(
-        UserManager<User> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager, IConfiguration configuration,IHttpContextAccessor httpContextAccessor)
+		private readonly IEmailService _emailService;
+
+		public UserAuthenticationRepository(
+        UserManager<User> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager, IConfiguration configuration,IHttpContextAccessor httpContextAccessor, IEmailService emailService)
         {
             _userManager = userManager;
             _mapper = mapper;
             _roleManager = roleManager;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
+            _emailService = emailService;
              
 
     }
@@ -124,5 +128,58 @@ namespace Bislerium.Services
         }
 
 
-    }
+		public async Task ForgotPassword(string email)
+		{
+			var user = await _userManager.FindByEmailAsync(email);
+			if (user != null)
+			{
+				var passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+				var token = ToUrlSafeBase64(passwordResetToken);
+				await _emailService.SendForgotPasswordEmailAsync(user.FirstName, email, token);
+			}
+		}
+
+		public async Task ResetPassword(string email, string token, string password)
+		{
+			var user = await _userManager.FindByEmailAsync(email);
+			if (user != null)
+			{
+				var passwordResetToken = FromUrlSafeBase64(token);
+				var result = await _userManager.ResetPasswordAsync(user, passwordResetToken, password);
+                
+				ValidateIdentityResult(result);
+			}
+		}
+		public async Task ChangePassowrd(string currentPassword, string newPassword)
+		{
+			string getCurrentUserId = GetCurrentUserId();
+			var user = await _userManager.FindByIdAsync(getCurrentUserId);
+			if (user != null)
+			{
+				var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+				ValidateIdentityResult(result);
+			}
+		}
+
+		private void ValidateIdentityResult(IdentityResult result)
+		{
+			if (!result.Succeeded)
+			{
+				var errors = result.Errors.Select(x => x.Description);
+				throw new Exception(errors.ToString());
+			}
+		}
+
+		private static string ToUrlSafeBase64(string base64String)
+		{
+			return base64String.Replace('+', '-').Replace('/', '_').Replace('=', '*');
+		}
+
+		private static string FromUrlSafeBase64(string urlSafeBase64String)
+		{
+			return urlSafeBase64String.Replace('-', '+').Replace('_', '/').Replace('*', '=');
+		}
+
+		
+	}
 }

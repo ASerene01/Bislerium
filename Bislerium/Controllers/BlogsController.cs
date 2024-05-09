@@ -212,7 +212,7 @@ namespace Bislerium.Controllers
                 {
                     // If user previously downvoted or had no reaction, toggle on the upvote
                     existingReaction.Upvote = true;
-					newReaction.CreatedAt = DateTime.Now;
+					existingReaction.CreatedAt = DateTime.Now;
 					existingReaction.Downvote = false; // Reset downvote if applicable
                 }
             }
@@ -255,7 +255,7 @@ namespace Bislerium.Controllers
             }
             else
             {
-                if (existingReaction.Upvote)
+                if (existingReaction.Downvote)
                 {
                     // If user previously upvoted, toggle off the upvote
                     existingReaction.Downvote = false;
@@ -264,7 +264,7 @@ namespace Bislerium.Controllers
                 {
                     // If user previously downvoted or had no reaction, toggle on the upvote
                     existingReaction.Downvote = true;
-					newReaction.CreatedAt = DateTime.Now;
+					existingReaction.CreatedAt = DateTime.Now;
 					existingReaction.Upvote = false; // Reset downvote if applicable
                 }
             }

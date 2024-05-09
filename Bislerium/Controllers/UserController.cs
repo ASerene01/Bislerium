@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Mail;
 
 namespace Bislerium.Controllers
 {
@@ -15,6 +16,8 @@ namespace Bislerium.Controllers
 		private readonly AppDbContext _context;
 
 		protected readonly IRepositoryManager _repository;
+		private readonly string _from;
+		private readonly SmtpClient _client;
 		public UserController(AppDbContext context, IRepositoryManager repositoryManager)
 		{
 			_context = context;
@@ -76,6 +79,10 @@ namespace Bislerium.Controllers
 
 			return NoContent();
 		}
+
+
+
+
 		private bool UserExists(string id)
 		{
 			return _context.Users.Any(e => e.Id == id);

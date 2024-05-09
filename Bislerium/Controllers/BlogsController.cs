@@ -104,7 +104,7 @@ namespace Bislerium.Controllers
         // POST: api/Blogs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize(Roles = "Admins,Blogger")]
+        //[Authorize(Roles = "Admins,Blogger")]
         public async Task<ActionResult<Blog>> PostBlog(Blog blog)
         {
             string getCurrentUserId = _repository.UserAuthentication.GetCurrentUserId();
@@ -168,8 +168,7 @@ namespace Bislerium.Controllers
             }
             
             // Associate the comment with the blog
-            blog.Comments ??= new List<Comment>(); // Ensure Comments collection is initialized
-            blog.Comments.Add(newComment);// Add the new comment to the blog's Comments collection
+           _context.Comments.Add(newComment);
 
             // Save changes to persist the new comment in the database
             await _context.SaveChangesAsync();

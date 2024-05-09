@@ -1,63 +1,77 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom"; // Import Link for navigation
 
 const Home = () => {
-    const [blogs, setBlogs] = useState([]);
+  const [blogs, setBlogs] = useState([]);
 
-    useEffect(() => {
-        // Fetch blogs from the backend API
-        const fetchBlogs = async () => {
-            try {
-                const response = await axios.get('https://localhost:7274/api/Blogs');
-                setBlogs(response.data);
-            } catch (error) {
-                console.error('Error fetching blogs:', error);
-            }
-        };
-
-        fetchBlogs();
-    }, []);
-
-    return (
-        <div className="container">
-            <h1 className="mt-5 mb-4">Welcome to Bislerium Blogs</h1>
-            <hr className="text-white" />
-            {blogs.map(blog => (
-                <div key={blog.id} className="card mb-4">
-                    <div className="card-body">
-                        <h2 className="card-title">{blog.title}</h2>
-                        <p className="card-text">{blog.body}</p>
-                        {blog.images && blog.images.map(image => (
-                            <img key={image.id} src={image.url} alt={image.alt} className="img-fluid mb-3" />
-                        ))}
-                        <div className="d-flex justify-content-between align-items-center">
-                            <div>
-                                <button className="btn btn-primary me-2">Like</button>
-                                <button className="btn btn-danger">Dislike</button>
-                            </div>
-                            <div>
-                                <small className="me-2">Author: {blog.author}</small>
-                                <small>Published: {new Date(blog.createdAt).toLocaleDateString()}</small>
-                            </div>
-                        </div>
-                        <hr />
-                        <h4>Comments</h4>
-                        {blog.comments && blog.comments.map(comment => (
-                            <div key={comment.id} className="mb-3">
-                                <strong>{comment.author}:</strong> {comment.text}
-                            </div>
-                        ))}
-                        <form className="mt-3">
-                            <div className="mb-3">
-                                <textarea className="form-control" rows="3" placeholder="Add a comment"></textarea>
-                            </div>
-                            <button type="submit" className="btn btn-primary">Post Comment</button>
-                        </form>
-                    </div>
+  useEffect(() => {
+    // Fetch blogs from the backend API
+    const fetchBlogs = async () => {
+      try {
+        const response = await axios.get("https://localhost:7274/api/Blogs");
+        setBlogs(response.data);
+      } catch (error) {
+        console.error("Error fetching blogs:", error);
+      }
+    };
+    // console.log(fetchBlogs);
+    fetchBlogs();
+  }, []);
+  console.log("blogs", blogs);
+  return (
+    <div className="container mt-5">
+      <h1 className="mb-4 text-primary">Welcome to Bislerium Blogs</h1>
+      <hr className="bg-primary" />
+      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {blogs.map((blog) => (
+          <div key={blog.id} className="col">
+            <div className="card h-100">
+              <div className="card-body">
+                <h2 className="card-title">{blog.title}</h2>
+                <p className="card-text">{blog.body}</p>
+                {blog.images &&
+                  blog.images.map((image) => (
+                    <img
+                      key={image.id}
+                      src={image.url}
+                      alt={image.alt}
+                      className="img-fluid mb-3"
+                    />
+                  ))}
+                <div className="d-flex justify-content-between align-items-center mt-3">
+                  <div>
+                    <button className="btn btn-outline-primary me-2">
+                      Like
+                    </button>
+                    <button className="btn btn-outline-danger">Dislike</button>
+                  </div>
+                  <div>
+                    <small className="me-2">Author: {blog.author}</small>
+                    <small>
+                      Published: {new Date(blog.createdAt).toLocaleDateString()}
+                    </small>
+                  </div>
                 </div>
-            ))}
-        </div>
-    );
+                <hr className="mt-3 mb-2" />
+
+                <div className="mt-3">
+                  {/* View Blog Button */}
+
+                  <Link
+                    to={`/individualBlog/${blog.blogId}`}
+                    className="btn btn-primary"
+                  >
+                    View Blog
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default Home;

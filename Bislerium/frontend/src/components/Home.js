@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom"; // Import Link for navigation
+import { useAuth } from "./Auth/AuthContext";
 
 const Home = () => {
   const [blogs, setBlogs] = useState([]);
-
+  const { user, isLoggedIn, handleLogout } = useAuth();
+  const token = localStorage.getItem("token");
   useEffect(() => {
     // Fetch blogs from the backend API
     const fetchBlogs = async () => {
@@ -18,6 +20,33 @@ const Home = () => {
     // console.log(fetchBlogs);
     fetchBlogs();
   }, []);
+
+  const handleLike = async (blogid) => {
+    try {
+      await axios.post(`https://localhost:7057/api/Blogs/${blogid}/upvote`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      console.error("Error liking comment:", error);
+    }
+  };
+
+  const handleDislike = async (blogid) => {
+    try {
+      // console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+      await axios.post(`https://localhost:7057/api/Blogs/${blogid}/downvote`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      // Similar to handleLike but for dislike endpoint
+    } catch (error) {
+      console.error("Error disliking comment:", error);
+    }
+  };
+
   console.log("blogs", blogs);
   return (
     <div className="container mt-5">
@@ -41,10 +70,22 @@ const Home = () => {
                   ))}
                 <div className="d-flex justify-content-between align-items-center mt-3">
                   <div>
-                    <button className="btn btn-outline-primary me-2">
-                      Like
-                    </button>
-                    <button className="btn btn-outline-danger">Dislike</button>
+                    {isLoggedIn && (
+                      <div className="d-flex">
+                        <button
+                          className="post-btn me-2"
+                          onClick={() => handleLike(blog.blogId)}
+                        >
+                          <i class="bi bi-hand-thumbs-up"></i>
+                        </button>
+                        <button
+                          className="dislike-btn"
+                          onClick={() => handleDislike(blog.blogId)}
+                        >
+                          <i class="bi bi-hand-thumbs-down"></i>
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <small className="me-2">Author: {blog.author}</small>

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 const UserBlog = () => {
   const [blogs, setBlogs] = useState([]);
+  const token = localStorage.getItem("token");
   const { user, isLoggedIn, handleLogout } = useAuth(); // Use useAuth hook to access authentication context
   const [formData, setFormData] = useState({
     title: "",
@@ -38,17 +39,21 @@ const UserBlog = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    //if (formData.password !== formData.confirmPassword) {
-    //    return Response.json({message: "password didnt match"})
-
-    //}
 
     try {
-      // Make a POST request to the registration endpoint
-      const response = await axios.post("https://localhost:7274/api/Blogs", {
-        title: formData.title,
-        body: formData.lastName,
-      });
+      // Make a POST request to the registr ation endpoint
+      const response = await axios.post(
+        "https://localhost:7274/api/Blogs",
+        {
+          title: formData.title,
+          body: formData.body,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       console.log({
         title: formData.title,
         body: formData.lastName,
@@ -78,7 +83,7 @@ const UserBlog = () => {
     <div className="container mt-5">
       <div class="d-flex justify-content-around">
         <div>
-          <h1 className="mb-4 text-primary">Hello {user.FirstName}</h1>
+          <h1 className="mb-4 text-primary">Hello to your blog</h1>
         </div>
         <div>
           <button

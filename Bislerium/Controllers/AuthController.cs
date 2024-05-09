@@ -14,32 +14,12 @@ namespace Bislerium.Controllers
         {
         }
 		[HttpPost("register")]
-		public async Task<IActionResult> RegisterUser([FromForm] UserRegistrationDto userRegistration)
+		public async Task<IActionResult> RegisterUser([FromBody] UserRegistrationDto userRegistration)
 		{
-			if (!ModelState.IsValid)
-			{
-				var errors = ModelState.Where(x => x.Value != null && x.Value.Errors.Count > 0)
-					.ToDictionary(
-						x => x.Key,
-						x => x.Value.Errors.Select(y => y.ErrorMessage).ToArray()
-					);
-				return BadRequest(errors);
-			}
-
 			var userResult = await _repository.UserAuthentication.RegisterUserAsync(userRegistration);
-
-			if (!userResult.Succeeded)
-			{
-				var errors = userResult.Errors.GroupBy(x => x.Code)
-					.ToDictionary(
-						x => x.Key,
-						x => x.Select(y => y.Description).ToArray()
-					);
-				return BadRequest(errors);
-			}
-
-			return StatusCode(201);
+			return !userResult.Succeeded ? new BadRequestObjectResult(userResult) : StatusCode(201);
 		}
+	
 
 
 		[HttpPost("login")]

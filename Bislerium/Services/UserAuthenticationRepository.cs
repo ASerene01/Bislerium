@@ -80,22 +80,28 @@ namespace Bislerium.Services
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
         }
 
-        private async Task<List<Claim>> GetClaims()
-        {
-            var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, _user.UserName),
-            new Claim(ClaimTypes.NameIdentifier, _user.Id)
-        };
-            var roles = await _userManager.GetRolesAsync(_user);
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-            return claims;
-        }
+		private async Task<List<Claim>> GetClaims()
+		{
+			
+			var claims = new List<Claim>
+				{
+			new Claim(ClaimTypes.Name, _user.Id),
+			new Claim("Email", _user.Email),
+			new Claim("FirstName", _user.FirstName),
+			new Claim("LastName", _user.LastName),
 
-        private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
+};
+			var roles = await _userManager.GetRolesAsync(_user);
+			foreach (var role in roles)
+			{
+				claims.Add(new Claim(ClaimTypes.Role, role));
+                claims.Add(new Claim("Role", role));
+            }
+
+			return claims;
+		}
+
+		private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
         {
             var jwtSettings = _configuration.GetSection("JwtConfig");
             var tokenOptions = new JwtSecurityToken

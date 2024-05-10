@@ -72,7 +72,7 @@ namespace Bislerium.Controllers
         // PUT: api/Blogs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Blogger")]
+ 
         public async Task<IActionResult> PutBlog(int id, Blog blog)
         {
             if (id != blog.BlogId)
@@ -278,7 +278,68 @@ namespace Bislerium.Controllers
             return Ok(); // Return 200 OK if the comment was added successfully
         }
 
-        private bool BlogExists(int id)
+		[HttpGet]
+		[Route("BlogsByPopularity")]
+		public async Task<IActionResult> GetBlogsByPopularity()
+		{
+			try
+			{
+				var activeBlogs = await _context.Blog.Include(blog => blog.User) // Include the User navigation property
+												  .OrderByDescending(blog => blog.BlogPopularity) // Order by Popularity (highest to lowest)
+												  .Select(blog => new
+												  {
+													  blog.BlogId,
+													  blog.Title,
+													  blog.Body,
+													  blog.CreatedAt,
+                                                      blog.BlogPopularity,
+												  })
+												  .ToListAsync();
+
+				return Ok(activeBlogs); // Return the list of active blogs by popularity with user details
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, "An error occurred while fetching the active blogs by popularity."); // Return an error response
+			}
+		}
+
+		[HttpGet]
+		[Route("Recency")]
+		public async Task<ActionResult<IEnumerable<Blog>>> GetRecentBlogs()
+		{
+			// Order blogs by CreatedAt in descending order
+			var blogs = await _context.Blog.OrderByDescending(b => b.CreatedAt).ToListAsync();
+			return blogs;
+		}
+
+		[HttpGet]
+		[Route("RandomBlogs")]
+		public async Task<IActionResult> GetRandomBlogs()
+		{
+			try
+			{
+				var activeBlogs = await _context.Blog.Include(blog => blog.User) // Include the User navigation property
+											  .OrderBy(o => Guid.NewGuid()) // Order by Popularity (highest to lowest)
+											  .Select(blog => new
+											  {
+												  blog.BlogId,
+												  blog.Title,
+												  blog.Body,
+												  blog.CreatedAt,
+												  blog.BlogPopularity,
+											  })
+											  .ToListAsync();
+
+				return Ok(activeBlogs); // Return the list of random active blogs with user details
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, "An error occurred while fetching the random active blogs."); // Return an error response
+			}
+		}
+
+		private bool BlogExists(int id)
         {
             return _context.Blog.Any(e => e.BlogId == id);
         }

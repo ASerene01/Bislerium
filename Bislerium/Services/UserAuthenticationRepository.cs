@@ -86,6 +86,7 @@ namespace Bislerium.Services
 			var claims = new List<Claim>
 				{
 			new Claim(ClaimTypes.Name, _user.Id),
+			new Claim(ClaimTypes.NameIdentifier, _user.Id),
 			new Claim("UserId", _user.Id),
 			new Claim("Email", _user.Email),
 			new Claim("FirstName", _user.FirstName),
@@ -96,7 +97,7 @@ namespace Bislerium.Services
 			foreach (var role in roles)
 			{
 				claims.Add(new Claim(ClaimTypes.Role, role));
-                claims.Add(new Claim("Role", role));
+                
             }
 
 			return claims;
@@ -122,7 +123,7 @@ namespace Bislerium.Services
            
             if (httpContext != null)
             {
-                
+                 
                 var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (userId != null)
                     return userId;
@@ -157,10 +158,10 @@ namespace Bislerium.Services
 				ValidateIdentityResult(result);
 			}
 		}
-		public async Task ChangePassowrd(string currentPassword, string newPassword)
+		public async Task ChangePassowrd(string userId, string currentPassword, string newPassword)
 		{
-			string getCurrentUserId = GetCurrentUserId();
-			var user = await _userManager.FindByIdAsync(getCurrentUserId);
+			
+			var user = await _userManager.FindByIdAsync(userId);
 			if (user != null)
 			{
 				var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);

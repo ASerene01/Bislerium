@@ -2,13 +2,14 @@
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import TextInput from "../Common/TextInput";
+import { useAuth } from "../Auth/AuthContext";
 
 const Login = () => {
   const [formData, setFormData] = useState({ userName: "", password: "" });
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-
+  const { user, isLoggedIn, handleLogout } = useAuth();
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -25,11 +26,15 @@ const Login = () => {
         "https://localhost:7274/api/Auth/login",
         formData
       );
+      console.log(user?.Role);
 
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
+
         setFormData({ userName: "", password: "" });
+
         navigate("/");
+        window.location.reload();
       } else {
         throw new Error("Login failed");
       }

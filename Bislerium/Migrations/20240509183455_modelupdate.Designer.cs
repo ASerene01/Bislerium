@@ -4,6 +4,7 @@ using Bislerium.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bislerium.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240509183455_modelupdate")]
+    partial class modelupdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -109,6 +112,8 @@ namespace Bislerium.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CommentReactionId");
+
+                    b.HasIndex("CommentId");
 
                     b.ToTable("CommentReactions");
                 });
@@ -388,6 +393,15 @@ namespace Bislerium.Migrations
                         .IsRequired();
 
                     b.Navigation("Blog");
+                });
+
+            modelBuilder.Entity("Bislerium.Models.CommentReaction", b =>
+                {
+                    b.HasOne("Bislerium.Models.Comment", "Comment")
+                        .WithMany()
+                        .HasForeignKey("CommentId");
+
+                    b.Navigation("Comment");
                 });
 
             modelBuilder.Entity("Bislerium.Models.Reaction", b =>

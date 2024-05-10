@@ -4,12 +4,12 @@ import { useAuth } from "../Auth/AuthContext"; // Import useAuth hook
 
 const Navbar = () => {
   const { user, isLoggedIn, handleLogout } = useAuth(); // Use useAuth hook to access authentication context
-  console.log("0-0-0-0-0-0-0-0-0-0-0", user);
+  // console.log("0-0-0-0-0-0-0-0-0-0-0", user);
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container">
         <Link className="navbar-brand" to="/">
-          Navbar
+          Bislerium Blogs
         </Link>
         <button
           className="navbar-toggler"
@@ -37,13 +37,12 @@ const Navbar = () => {
                 >
                   UserBlog
                 </Link>
+                <Link className="nav-link btn btn-link" to="/UserProfile">
+                  UserProfile
+                </Link>
                 <a className="nav-link btn btn-link" onClick={handleLogout}>
                   Logout
                 </a>
-
-                {/* <Link className="nav-link p-2" to="/IndividualBlog">
-                  User Blog
-                </Link> */}
               </>
             ) : (
               <>

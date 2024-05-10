@@ -45,10 +45,17 @@ namespace Bislerium.Controllers
 		}
 
 		[HttpPost("change-password")]
-		public async Task<IActionResult> ChangePassowrd(string currentPassword, string newPassword)
+		public async Task<IActionResult> ChangePassowrd([FromBody] ChangePasswordRequest request)
 		{
-			await _repository.UserAuthentication.ChangePassowrd(currentPassword, newPassword);
+			await _repository.UserAuthentication.ChangePassowrd(request.userId,request.CurrentPassword, request.NewPassword);
 			return Ok("Password changed successfully.");
+		}
+
+		public class ChangePasswordRequest
+		{
+			public string userId { get; set; }
+			public string CurrentPassword { get; set; }
+			public string NewPassword { get; set; }
 		}
 	}
 }

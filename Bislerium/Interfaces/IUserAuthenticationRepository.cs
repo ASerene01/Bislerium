@@ -10,7 +10,7 @@ namespace Bislerium.Interfaces
         Task<bool> ValidateUserAsync(UserLoginDto loginDto);
         Task<string> CreateTokenAsync();
 		Task ForgotPassword(string email);
-		Task ChangePassowrd(string currentPassword, string newPassword);
+		Task ChangePassowrd(string userId, string currentPassword, string newPassword);
 		Task ResetPassword(string email, string token, string password);
 		string GetCurrentUserId();
     }

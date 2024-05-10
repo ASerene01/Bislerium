@@ -12,7 +12,7 @@ namespace Bislerium.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public string? UserId { get; set; }
-        public User? User { get; set; }
+      
 
         public int? BlogId { get; set; }
         public Blog? Blog { get; set; }

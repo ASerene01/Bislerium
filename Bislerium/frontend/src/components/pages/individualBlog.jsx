@@ -2,9 +2,12 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useAuth } from "../Auth/AuthContext";
 
 const IndividualBlog = () => {
   const { id } = useParams();
+  const token = localStorage.getItem("token");
+  const { user, isLoggedIn, handleLogout } = useAuth();
 
   const [newComment, setNewComment] = useState("");
 
@@ -28,6 +31,37 @@ const IndividualBlog = () => {
       console.error("Error fetching blogs:", error);
     }
     setNewComment("");
+  };
+
+  const handleLike = async (CommentId) => {
+    try {
+      await axios.post(
+        `https://localhost:7274/api/Comments/${CommentId}/upvote`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Error liking comment:", error);
+    }
+  };
+
+  const handleDislike = async (CommentId) => {
+    try {
+      await axios.post(
+        `https://localhost:7274/api/Comments/${CommentId}/downvote`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      // Similar to handleLike but for dislike endpoint
+    } catch (error) {
+      console.error("Error disliking comment:", error);
+    }
   };
 
   const [blogs, setBlogs] = useState([]);
@@ -86,7 +120,6 @@ const IndividualBlog = () => {
                 {blogs.body}
               </p>
             </div>
-
             <h3
               className="header-one"
               style={{
@@ -97,8 +130,8 @@ const IndividualBlog = () => {
             >
               Comments
             </h3>
-
             {/* Render existing comments */}
+            {console.log(comments)};
             {comments.map((comment, index) => (
               <div
                 key={index}
@@ -124,9 +157,24 @@ const IndividualBlog = () => {
                     {comment.content}
                   </p>
                 </div>
+                {isLoggedIn && (
+                  <div className="d-flex gap-2">
+                    <button
+                      className="post-btn me-2"
+                      onClick={() => handleLike(comment.CommentId)}
+                    >
+                      <i className="bi bi-hand-thumbs-up"></i>
+                    </button>
+                    <button
+                      className="dislike-btn "
+                      onClick={() => handleDislike(comment.CommentId)}
+                    >
+                      <i className="bi bi-hand-thumbs-down"></i>
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
-
             {/* Add Comment Section */}
             <div className="mb-4">
               <textarea

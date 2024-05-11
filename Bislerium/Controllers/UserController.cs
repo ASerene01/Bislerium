@@ -145,6 +145,22 @@ namespace Bislerium.Controllers
 			return Ok(user);
 		}
 
+		[HttpGet]
+		[Route("GetUser/{userid}")]
+		public async Task<IActionResult> GetOneUserById(string userid)
+		{
+			
+			var user = await _userManager.FindByIdAsync(userid);
+			
+
+			if (user == null)
+			{
+				return NotFound(); // User not found
+			}
+
+			return Ok(user);
+		}
+
 
 
 	}

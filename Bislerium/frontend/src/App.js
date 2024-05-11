@@ -31,7 +31,7 @@ const App = () => {
     <Router>
       <AuthProvider>
         <Navbar />
-        <div className="container p-5 pt-4">
+        <div className="container-fluid p-0">
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />

@@ -14,6 +14,7 @@ using Bislerium.Interfaces;
 using Bislerium.Services;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using Microsoft.AspNetCore.Identity;
+using Bislerium.Migrations;
 
 namespace Bislerium.Controllers
 {
@@ -73,7 +74,6 @@ namespace Bislerium.Controllers
         // PUT: api/Blogs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
- 
         public async Task<IActionResult> PutBlog(int id, Blog blog)
         {
             if (id != blog.BlogId)
@@ -173,11 +173,16 @@ namespace Bislerium.Controllers
             
             // Associate the comment with the blog
            _context.Comments.Add(newComment);
+			
+			// Save changes to persist the new comment in the database
+			await _context.SaveChangesAsync();
+			int updatedBlogPopularity = BlogPopularityCalculator.CalculateBlogPopularity(blogId, _context.Reactions, _context.Comments);
 
-            // Save changes to persist the new comment in the database
-            await _context.SaveChangesAsync();
+			// Update the BlogPopularity property of the blog post
+			blog.BlogPopularity = updatedBlogPopularity;
+			await _context.SaveChangesAsync();
 
-            return Ok(); // Return 200 OK if the comment was added successfully
+			return Ok(); // Return 200 OK if the comment was added successfully
         }
 
         [HttpPost("{blogId}/upvote")]
@@ -219,8 +224,9 @@ namespace Bislerium.Controllers
 					existingReaction.Downvote = false; // Reset downvote if applicable
                 }
             }
+			await _context.SaveChangesAsync();
 
-            int updatedBlogPopularity = BlogPopularityCalculator.CalculateBlogPopularity(blogId, _context.Reactions, _context.Comments);
+			int updatedBlogPopularity = BlogPopularityCalculator.CalculateBlogPopularity(blogId, _context.Reactions, _context.Comments);
 
             // Update the BlogPopularity property of the blog post
             blog.BlogPopularity = updatedBlogPopularity;
@@ -231,7 +237,18 @@ namespace Bislerium.Controllers
             return Ok(); // Return 200 OK if the comment was added successfully
         }
 
-        [HttpPost("{blogId}/downvote")]
+		[HttpGet("upvoteCount/{blogId}")]
+		public async Task<ActionResult> GetUpvoteCount(int blogId)
+		{
+
+			int upvotes = _context.Reactions.Count(r => r.BlogId == blogId && r.Upvote);
+
+			
+
+			return Ok(upvotes);
+		}
+
+		[HttpPost("{blogId}/downvote")]
         public async Task<ActionResult> Downvote(int blogId)
         {
             // Call the method to add the comment to the blog
@@ -271,8 +288,9 @@ namespace Bislerium.Controllers
 					existingReaction.Upvote = false; // Reset downvote if applicable
                 }
             }
+			await _context.SaveChangesAsync();
 
-            int updatedBlogPopularity = BlogPopularityCalculator.CalculateBlogPopularity(blogId, _context.Reactions, _context.Comments);
+			int updatedBlogPopularity = BlogPopularityCalculator.CalculateBlogPopularity(blogId, _context.Reactions, _context.Comments);
 
             // Update the BlogPopularity property of the blog post
             blog.BlogPopularity = updatedBlogPopularity;
@@ -281,6 +299,17 @@ namespace Bislerium.Controllers
 
             return Ok(); // Return 200 OK if the comment was added successfully
         }
+
+		[HttpGet("downvoteCount/{blogId}")]
+		public async Task<ActionResult> GetDownvoteCount(int blogId)
+		{
+
+			int downvotes = _context.Reactions.Count(r => r.BlogId == blogId && r.Downvote);
+
+
+
+			return Ok(downvotes);
+		}
 
 		[HttpGet]
 		[Route("BlogsByPopularity")]

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Bislerium.Models
 {
@@ -9,20 +10,24 @@ namespace Bislerium.Models
 
         public string Title { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public string Body { get; set; }
 
-        public string? BloggerId { get; set; }
+        public string? BloggerId { get; set; } 
 
         public int BlogPopularity { get; set; } = 0;
         public User? User { get; set; }
 
-        public List<Comment>? Comments { get; set; }
+		[Column(TypeName = "nvarchar(100)")]
+		public string? ImageName { get; set; }
 
-        public Blog()
-        {
-            CreatedAt = DateTime.UtcNow; 
-        }
+		[NotMapped]
+		public IFormFile? ImageFile { get; set; }
+
+		[NotMapped]
+		public string? ImageSrc { get; set; }
+
+        
 
     }
 }

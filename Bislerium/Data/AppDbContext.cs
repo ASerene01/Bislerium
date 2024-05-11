@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Bislerium.Models;
 
+
 namespace Bislerium.Data
 {
     public class AppDbContext : IdentityDbContext<User>
@@ -19,6 +20,7 @@ namespace Bislerium.Data
         public DbSet<Reaction> Reactions { get; set; }
 		public DbSet<CommentReaction> CommentReactions { get; set; }
 		public DbSet<User> Users { get; set; }
+		
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

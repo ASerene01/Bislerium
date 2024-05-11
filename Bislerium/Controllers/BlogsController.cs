@@ -15,6 +15,8 @@ using Bislerium.Services;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using Microsoft.AspNetCore.Identity;
 using Bislerium.Migrations;
+using Microsoft.Extensions.Hosting;
+using System.IO;
 
 namespace Bislerium.Controllers
 {
@@ -24,18 +26,29 @@ namespace Bislerium.Controllers
     {
         private readonly AppDbContext _context;
 
-        protected readonly IRepositoryManager _repository;
-        public BlogsController(AppDbContext context, IRepositoryManager repositoryManager)
+		private readonly IHostEnvironment _hostEnvironment;
+		protected readonly IRepositoryManager _repository;
+        public BlogsController(AppDbContext context, IRepositoryManager repositoryManager,IHostEnvironment hostEnvironment)
         {
             _context = context;
             _repository = repositoryManager;
+            _hostEnvironment = hostEnvironment;
         }
 
         // GET: api/Blogs
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Blog>>> GetBlog()
         {
-            return await _context.Blog.ToListAsync();
+			return await _context.Blog
+				.Select(x => new Blog()
+				{
+					Title = x.Title,
+					Body = x.Body,
+					ImageName = x.ImageName,
+					ImageSrc = String.Format("{0}://{1}{2}/Images/{3}", Request.Scheme, Request.Host, Request.PathBase, x.ImageName)
+				})
+				.ToListAsync();
+			//return await _context.Blog.ToListAsync();
         }
 
 		// GET: api/Blogs
@@ -44,10 +57,19 @@ namespace Bislerium.Controllers
 		public async Task<ActionResult<IEnumerable<Blog>>> GetCurrentUsersBlog()
 		{
 			string getCurrentUserId = _repository.UserAuthentication.GetCurrentUserId();
-			var blogs = await _context.Blog
-			   .Where(c => c.BloggerId == getCurrentUserId)
-			   .ToListAsync();
-
+			//var blogs = await _context.Blog
+			   //.Where(c => c.BloggerId == getCurrentUserId)
+			  // .ToListAsync();
+			var blogs =  await _context.Blog
+				.Where(c => c.BloggerId == getCurrentUserId)
+				.Select(x => new Blog()
+				{
+					Title = x.Title,
+					Body = x.Body,
+					ImageName = x.ImageName,
+					ImageSrc = String.Format("{0}://{1}{2}/Images/{3}", Request.Scheme, Request.Host, Request.PathBase, x.ImageName)
+				})
+				.ToListAsync();
 			if (blogs == null || blogs.Count == 0)
 			{
 				return NotFound();
@@ -61,9 +83,19 @@ namespace Bislerium.Controllers
 		[HttpGet("{id}")]
         public async Task<ActionResult<Blog>> GetBlog(int id)
         {
-            var blog = await _context.Blog.FindAsync(id);
+			var blog = await _context.Blog
+				.Where(x => x.BlogId == id)
+				.Select(x => new Blog
+				{
+					BlogId = x.BlogId,
+					Title = x.Title,
+					Body = x.Body,
+					ImageName = x.ImageName,
+					ImageSrc = String.Format("{0}://{1}{2}/Images/{3}", Request.Scheme, Request.Host, Request.PathBase, x.ImageName)
+				})
+				.FirstOrDefaultAsync();
 
-            if (blog == null)
+			if (blog == null)
             {
                 return NotFound();
             }
@@ -112,15 +144,41 @@ namespace Bislerium.Controllers
         public async Task<ActionResult<Blog>> PostBlog(Blog blog)
         {
             string getCurrentUserId = _repository.UserAuthentication.GetCurrentUserId();
-            blog.BloggerId= getCurrentUserId; 
-            _context.Blog.Add(blog);
+            blog.BloggerId= getCurrentUserId;
+			blog.ImageName = await SaveImage(blog.ImageFile);
+			_context.Blog.Add(blog);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetBlog", new { id = blog.BlogId }, blog);
         }
 
-        // DELETE: api/Blogs/5
-        [HttpDelete("{id}")]
+		[NonAction]
+		public async Task<string> SaveImage(IFormFile imageFile)
+		{
+			if (imageFile == null || imageFile.Length == 0)
+			{
+				throw new ArgumentNullException("imageFile", "Image file is required and cannot be empty.");
+			}
+
+			// Generate unique image name
+			string imageName = Path.GetFileNameWithoutExtension(imageFile.FileName);
+			imageName = imageName.Substring(0, Math.Min(imageName.Length, 10)); // Limit to first 10 characters
+			imageName = imageName.Replace(' ', '-') + DateTime.Now.ToString("yymmssfff") + Path.GetExtension(imageFile.FileName);
+
+			// Construct full file path
+			var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "Images", imageName);
+
+			// Save file to disk
+			using (var fileStream = new FileStream(imagePath, FileMode.Create))
+			{
+				await imageFile.CopyToAsync(fileStream);
+			}
+
+			return imageName;
+		}
+
+		// DELETE: api/Blogs/5
+		[HttpDelete("{id}")]
         [Authorize(Roles = "Admin,Blogger")]
         public async Task<IActionResult> DeleteBlog(int id)
         {
@@ -321,12 +379,14 @@ namespace Bislerium.Controllers
 					.OrderByDescending(blog => blog.BlogPopularity) // Order by Popularity (highest to lowest)
 					.Select(blog => new
 					{
-						blog.BlogId,
-						blog.Title,
-						blog.Body,
-						blog.CreatedAt,
-                        blog.BlogPopularity,
-					})
+						BlogId = blog.BlogId,
+						Title = blog.Title,
+						Body = blog.Body,
+						CreatedAt = blog.CreatedAt,
+                        BlogPopularity = blog.BlogPopularity,
+						ImageName = blog.ImageName,
+						ImageSrc = String.Format("{0}://{1}{2}/Images/{3}", Request.Scheme, Request.Host, Request.PathBase, blog.ImageName)
+			        })
 					.ToListAsync();
 
 				return Ok(activeBlogs); // Return the list of active blogs by popularity with user details
@@ -339,11 +399,20 @@ namespace Bislerium.Controllers
 
 		[HttpGet]
 		[Route("Recency")]
-		public async Task<ActionResult<IEnumerable<Blog>>> GetRecentBlogs()
+		public async Task<IActionResult> GetRecentBlogs()
 		{
 			// Order blogs by CreatedAt in descending order
-			var blogs = await _context.Blog.OrderByDescending(b => b.CreatedAt).ToListAsync();
-			return blogs;
+			var blogs = await _context.Blog.OrderByDescending(b => b.CreatedAt).Select(blog => new
+			{
+				BlogId = blog.BlogId,
+				Title = blog.Title,
+				Body = blog.Body,
+				CreatedAt = blog.CreatedAt,
+				BlogPopularity = blog.BlogPopularity,
+				ImageName = blog.ImageName,
+				ImageSrc = String.Format("{0}://{1}{2}/Images/{3}", Request.Scheme, Request.Host, Request.PathBase, blog.ImageName)
+			}).ToListAsync();
+			return Ok(blogs);
 		}
 
 		[HttpGet]
@@ -356,11 +425,13 @@ namespace Bislerium.Controllers
 					.OrderBy(o => Guid.NewGuid()) // Order by Popularity (highest to lowest)
 					.Select(blog => new
 					{
-						blog.BlogId,
-						blog.Title,
-						blog.Body,
-						blog.CreatedAt,
-						blog.BlogPopularity,
+						BlogId = blog.BlogId,
+						Title = blog.Title,
+						Body = blog.Body,
+						CreatedAt = blog.CreatedAt,
+						BlogPopularity = blog.BlogPopularity,
+						ImageName = blog.ImageName,
+						ImageSrc = String.Format("{0}://{1}{2}/Images/{3}", Request.Scheme, Request.Host, Request.PathBase, blog.ImageName)
 					})
 					.ToListAsync();
 

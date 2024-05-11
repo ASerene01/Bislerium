@@ -220,12 +220,19 @@ const IndividualBlog = () => {
           <h2 className="mb-3" style={{ color: "#ffc107" }}>
             {blogs.title}
           </h2>
-          <img
-            src="https://media.formula1.com/image/upload/t_16by9Centre/f_auto/q_auto/v1707905211/fom-website/2023/Mercedes/W15%20launch/Mercedes-AMG%20W15%20E%20PERFORMANCE%20-%20Lewis%20Hamilton%20-%20Front%20Quarter.jpg"
-            alt="Blog Image"
-            className="img-fluid mb-3"
-          />
-
+          {blogs.imageSrc == "https://localhost:7274/Images/" ? (
+            <img
+              src="https://media.formula1.com/image/upload/t_16by9Centre/f_auto/q_auto/v1707905211/fom-website/2023/Mercedes/W15%20launch/Mercedes-AMG%20W15%20E%20PERFORMANCE%20-%20Lewis%20Hamilton%20-%20Front%20Quarter.jpg"
+              className="img-fluid mb-3"
+              alt={blogs.title}
+            />
+          ) : (
+            <img
+              src={blogs.imageSrc}
+              className="img-fluid mb-3"
+              alt={blogs.title}
+            />
+          )}
           <p className="lead mb-4" style={{ color: "#fff" }}>
             {blogs.body}
           </p>

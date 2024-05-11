@@ -18,6 +18,7 @@ import UserProfile from "./components/pages/userProfile";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AdminRegister from "./components/Auth/AdminRegistration";
+import Hello from "./components/pages/hello";
 const App = () => {
   // const { user, isLoggedIn, handleLogout } = useAuth();
   // const navigate = useNavigate();
@@ -43,6 +44,7 @@ const App = () => {
             <Route path="/Dashboard" element={<Dashboard />} />
             <Route path="/UserProfile" element={<UserProfile />} />
             <Route path="/AdminRegister" element={<AdminRegister />} />
+            <Route path="/Hello" element={<Hello />} />
           </Routes>
           <ToastContainer position="bottom-left" />
         </div>

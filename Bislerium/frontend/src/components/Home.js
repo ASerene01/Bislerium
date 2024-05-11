@@ -162,11 +162,20 @@ const Home = () => {
         {currentBlogs.map((blog) => (
           <div key={blog.blogId} className="col">
             <div className="card h-100">
-              <img
-                src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"
-                className="card-img-top"
-                alt={blog.title}
-              />
+              {blog.imageSrc == "https://localhost:7274/Images/" ? (
+                <img
+                  src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"
+                  className="card-img-top"
+                  alt={blog.title}
+                />
+              ) : (
+                <img
+                  src={blog.imageSrc}
+                  className="card-img-top"
+                  alt={blog.title}
+                />
+              )}
+
               <div className="card-body">
                 <h2 className="card-title">{blog.title}</h2>
                 <div className="d-flex justify-content-between align-items-center mt-3">

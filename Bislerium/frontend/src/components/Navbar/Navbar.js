@@ -4,7 +4,7 @@ import { useAuth } from "../Auth/AuthContext"; // Import useAuth hook
 
 const Navbar = () => {
   const { user, isLoggedIn, handleLogout } = useAuth(); // Use useAuth hook to access authentication context
-  // console.log("0-0-0-0-0-0-0-0-0-0-0", user);
+  console.log("0-0-0-0-0-0-0-0-0-0-0", user);
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container">
@@ -29,21 +29,42 @@ const Navbar = () => {
             <Link className="nav-link active" aria-current="page" to="/">
               Home
             </Link>
+            {/* {user.Role == "Admins" && (
+              <Link className="nav-link btn btn-link" to="/Dashboard">
+                Dashboard
+              </Link>
+            )} */}
             {isLoggedIn ? (
-              <>
-                <Link
-                  className="nav-link btn btn-link"
-                  to={`/UserBlog/${user.UserId}`}
-                >
-                  UserBlog
-                </Link>
-                <Link className="nav-link btn btn-link" to="/UserProfile">
-                  UserProfile
-                </Link>
-                <a className="nav-link btn btn-link" onClick={handleLogout}>
-                  Logout
-                </a>
-              </>
+              user.Role === "Admins" ? (
+                <>
+                  <Link className="nav-link btn btn-link" to="/Dashboard">
+                    Dashboard
+                  </Link>
+                  <a className="nav-link btn btn-link" onClick={handleLogout}>
+                    Logout
+                  </a>
+                </>
+              ) : null
+            ) : (
+              <></>
+            )}
+            {isLoggedIn ? (
+              user.Role === "Blogger" ? (
+                <>
+                  <Link
+                    className="nav-link btn btn-link"
+                    to={`/UserBlog/${user.UserId}`}
+                  >
+                    UserBlog
+                  </Link>
+                  <Link className="nav-link btn btn-link" to="/UserProfile">
+                    UserProfile
+                  </Link>
+                  <a className="nav-link btn btn-link" onClick={handleLogout}>
+                    Logout
+                  </a>
+                </>
+              ) : null
             ) : (
               <>
                 <Link className="nav-link" to="/login">

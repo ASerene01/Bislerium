@@ -25,7 +25,6 @@ const UserProfile = () => {
     try {
       const response = await axios.delete(
         `https://localhost:7274/api/User/DeleteUser`,
-
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -23,7 +23,12 @@ const IndividualBlog = () => {
       // console.log(data);
       const response = await axios.post(
         `https://localhost:7274/api/Blogs/${id}/comments`,
-        data
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // setBlogs(response.data);
       // console.log(response.data, "-=-=-=-=-=-=-=-");
@@ -37,6 +42,7 @@ const IndividualBlog = () => {
     try {
       await axios.post(
         `https://localhost:7274/api/Comments/${CommentId}/upvote`,
+
         {
           headers: {
             Authorization: `Bearer ${token}`,

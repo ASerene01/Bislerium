@@ -11,7 +11,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./components/Navbar/Navbar";
 import { AuthProvider } from "./components/Auth/AuthContext";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import AdminDashboard from "./components/pages/AdminDashboard";
+import Dashboard from "./components/pages/Dashboard";
 import { useAuth } from "./components/Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import UserProfile from "./components/pages/userProfile";
@@ -39,7 +39,7 @@ const App = () => {
             {/* <Route path="/pages/blog" element={<Blog />} /> */}
             <Route path="/individualBlog/:id" element={<IndividualBlog />} />
             <Route path="/UserBlog/:userId" element={<UserBlog />} />
-            <Route path="/AdminDashboard" element={<AdminDashboard />} />
+            <Route path="/Dashboard" element={<Dashboard />} />
             <Route path="/UserProfile" element={<UserProfile />} />
           </Routes>
         </div>

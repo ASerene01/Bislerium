@@ -31,7 +31,12 @@ const UserBlog = () => {
     const fetchBlogs = async () => {
       try {
         const response = await axios.get(
-          "https://localhost:7274/currentUserBlogs"
+          "https://localhost:7274/currentUserBlogs",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setBlogs(response.data);
       } catch (error) {

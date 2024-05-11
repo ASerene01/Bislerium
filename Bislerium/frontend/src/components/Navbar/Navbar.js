@@ -8,9 +8,22 @@ const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container">
-        <Link className="navbar-brand" to="/">
-          Bislerium Blogs
-        </Link>
+        {isLoggedIn ? (
+          user.Role === "Admin" ? (
+            <Link className="navbar-brand" to="/Dashboard">
+              Bislerium Blogs
+            </Link>
+          ) : (
+            <Link className="nav-link active" aria-current="page" to="/">
+              Bislerium Blogs
+            </Link>
+          )
+        ) : (
+          <Link className="nav-link active" aria-current="page" to="/">
+            Bislerium Blogs
+          </Link>
+        )}
+
         <button
           className="navbar-toggler"
           type="button"

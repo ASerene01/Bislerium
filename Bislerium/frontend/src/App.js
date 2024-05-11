@@ -15,7 +15,8 @@ import Dashboard from "./components/pages/Dashboard";
 import { useAuth } from "./components/Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import UserProfile from "./components/pages/userProfile";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const App = () => {
   // const { user, isLoggedIn, handleLogout } = useAuth();
   // const navigate = useNavigate();
@@ -42,6 +43,7 @@ const App = () => {
             <Route path="/Dashboard" element={<Dashboard />} />
             <Route path="/UserProfile" element={<UserProfile />} />
           </Routes>
+          <ToastContainer position="bottom-left" />
         </div>
       </AuthProvider>
     </Router>

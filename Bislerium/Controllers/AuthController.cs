@@ -30,7 +30,7 @@ namespace Bislerium.Controllers
                 ? Unauthorized()
                 : Ok(new { Token = await _repository.UserAuthentication.CreateTokenAsync() });
         }
-		[HttpPost("forgot-password")]
+		[HttpPost("forgot-password/{email}")]
 		public async Task<IActionResult> ForgotPassword(string email)
 		{
 			await _repository.UserAuthentication.ForgotPassword(email);

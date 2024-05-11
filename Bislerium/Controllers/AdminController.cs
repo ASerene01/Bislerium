@@ -135,6 +135,8 @@ namespace Bislerium.Controllers
 				{
 					UserId = u.Id,
 					Username = u.UserName,
+					FirstName=u.FirstName,
+					LastName=u.LastName,
 					TotalPosts = _context.Blog.Count(b => b.BloggerId == u.Id),
 					TotalUpvotesReceived = _context.Reactions
 						.Where(r => _context.Blog.Any(b => b.BlogId == r.BlogId && b.BloggerId == u.Id) && r.Upvote)

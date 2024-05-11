@@ -136,8 +136,7 @@ const IndividualBlog = () => {
             >
               Comments
             </h3>
-            {/* Render existing comments */}
-            {console.log(comments)};
+
             {comments.map((comment, index) => (
               <div
                 key={index}

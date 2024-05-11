@@ -9,6 +9,7 @@ const UserBlog = () => {
   const [blogs, setBlogs] = useState([]);
   const [updateId, setUpdateId] = useState(null);
   const token = localStorage.getItem("token");
+
   const { user, isLoggedIn, handleLogout } = useAuth();
   const [formData, setFormData] = useState({
     title: "",
@@ -69,7 +70,8 @@ const UserBlog = () => {
           title: "",
           body: "",
         });
-        alert("Added successfully! You can now log in.");
+        alert("Added Blog successfully! ");
+        navigate(0);
       } else {
         throw new Error("Registration failed");
       }
@@ -84,15 +86,15 @@ const UserBlog = () => {
     try {
       const response = await axios.delete(
         `https://localhost:7274/api/Blogs/${blogId}`,
-
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-
+      console.log(response);
       alert("Blog Deleted Sucessfully");
+      navigate(0);
     } catch (error) {
       console.error(error.response);
       setError("Blog Not Deleted");
@@ -122,7 +124,8 @@ const UserBlog = () => {
           title: "",
           body: "",
         });
-        alert("Update successful! You can now log in.");
+
+        navigate(0);
       } else {
         throw new Error("Update failed");
       }
@@ -185,13 +188,14 @@ const UserBlog = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <TextInput
-                    type="text"
+                  <textarea
+                    className="form-control"
                     name="body"
                     value={formData.body}
                     onChange={handleChange}
                     placeholder="Body"
-                  />
+                    rows="3"
+                  ></textarea>
                 </div>
               </div>
               <div className="modal-footer">

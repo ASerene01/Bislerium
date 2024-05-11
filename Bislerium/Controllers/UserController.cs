@@ -1,4 +1,5 @@
 ﻿using Bislerium.Data;
+using Bislerium.Dtos;
 using Bislerium.Interfaces;
 using Bislerium.Models;
 using Bislerium.Services;
@@ -36,10 +37,9 @@ namespace Bislerium.Controllers
 
 		[HttpPut]
 		[Route("UpdateUser")]
-		public async Task<IActionResult> UpdateUser(User updatedUser)
+		public async Task<IActionResult> UpdateUser(UserRegistrationDto updatedUser)
 		{
 			var userID = _repository.UserAuthentication.GetCurrentUserId();	
-			Console.WriteLine(userID);
 			var user = await _userManager.FindByIdAsync(userID);
 
 			if (user == null)
@@ -130,11 +130,11 @@ namespace Bislerium.Controllers
 		}
 
 		[HttpGet]
-		[Route("GetUser/{Id}")]
-		public async Task<IActionResult> GetUserById(String Id)
+		[Route("GetUser")]
+		public async Task<IActionResult> GetUserById()
 		{
 			//var userID = _userAuthenticationRepository.GetUserId();
-			var userID = Id;
+			var userID = _repository.UserAuthentication.GetCurrentUserId(); ;
 			var user = await _userManager.FindByIdAsync(userID);
 
 			if (user == null)

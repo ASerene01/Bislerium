@@ -13,6 +13,7 @@ using AutoMapper;
 using Bislerium.Interfaces;
 using Bislerium.Services;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using Microsoft.AspNetCore.Identity;
 
 namespace Bislerium.Controllers
 {
@@ -79,12 +80,15 @@ namespace Bislerium.Controllers
             {
                 return BadRequest();
             }
-
-            _context.Entry(blog).State = EntityState.Modified;
-
+			var existingblog = await _context.Blog.FindAsync(id);
+			// Update the properties of the existing user with the values from the updatedUser
+			existingblog.Title = blog.Title ?? existingblog.Title;
+            existingblog.Body = blog.Body ?? existingblog.Body;
+            _context.Entry(existingblog).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();
+                return Ok();
             }
             catch (DbUpdateConcurrencyException)
             {

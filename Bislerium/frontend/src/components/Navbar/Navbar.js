@@ -4,7 +4,7 @@ import { useAuth } from "../Auth/AuthContext"; // Import useAuth hook
 
 const Navbar = () => {
   const { user, isLoggedIn, handleLogout } = useAuth(); // Use useAuth hook to access authentication context
-  console.log("0-0-0-0-0-0-0-0-0-0-0", user);
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container">

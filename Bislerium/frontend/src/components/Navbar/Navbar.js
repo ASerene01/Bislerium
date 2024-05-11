@@ -24,32 +24,34 @@ const Navbar = () => {
         </button>
         <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div className="navbar-nav ms-auto">
-            {" "}
-            {/* 'ms-auto' class for right alignment */}
-            <Link className="nav-link active" aria-current="page" to="/">
-              Home
-            </Link>
             {/* {user.Role == "Admins" && (
               <Link className="nav-link btn btn-link" to="/Dashboard">
                 Dashboard
               </Link>
             )} */}
             {isLoggedIn ? (
-              user.Role === "Admins" ? (
+              user.Role === "Admin" ? (
                 <>
                   <Link className="nav-link btn btn-link" to="/Dashboard">
                     Dashboard
+                  </Link>
+                  <Link className="nav-link btn btn-link" to="/UserProfile">
+                    UserProfile
                   </Link>
                   <a className="nav-link btn btn-link" onClick={handleLogout}>
                     Logout
                   </a>
                 </>
-              ) : null
+              ) : (
+                <Link className="nav-link active" aria-current="page" to="/">
+                  Home
+                </Link>
+              )
             ) : (
               <></>
             )}
             {isLoggedIn ? (
-              user.Role === "Blogger" ? (
+              user.Role === "Blogger" && (
                 <>
                   <Link
                     className="nav-link btn btn-link"
@@ -64,9 +66,12 @@ const Navbar = () => {
                     Logout
                   </a>
                 </>
-              ) : null
+              )
             ) : (
               <>
+                <Link className="nav-link active" aria-current="page" to="/">
+                  Home
+                </Link>
                 <Link className="nav-link" to="/login">
                   Login
                 </Link>

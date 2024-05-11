@@ -103,26 +103,28 @@ namespace Bislerium.Controllers
 			var startDate = new DateTime(request.Year, request.Month, 1);
 			var endDate = startDate.AddMonths(1).AddDays(-1);
 
+			// Query to retrieve top bloggers for the specified month
 			var topBloggers = await _context.Users
 				.Select(u => new TopBloggerDto
 				{
 					UserId = u.Id,
 					Username = u.UserName,
 					TotalPosts = _context.Blog
-						.Count(b => b.BloggerId == u.Id && b.CreatedAt >= startDate && b.CreatedAt <= endDate), // Count posts by the user in the chosen month
+						.Count(b => b.BloggerId == u.Id && b.CreatedAt >= startDate && b.CreatedAt <= endDate),
 					TotalUpvotesReceived = _context.Reactions
-						.Where(r => r.Blog.BloggerId == u.Id && r.Upvote && r.CreatedAt >= startDate && r.CreatedAt <= endDate)
-						.Count(), // Count upvotes on user's posts in the chosen month
+						.Where(r => _context.Blog.Any(b => b.BloggerId == u.Id && b.BlogId == r.BlogId) && r.Upvote && r.CreatedAt >= startDate && r.CreatedAt <= endDate)
+						.Count(),
 					TotalCommentsReceived = _context.Comments
-						.Where(c => c.Blog.BloggerId == u.Id && c.CreatedAt >= startDate && c.CreatedAt <= endDate)
-						.Count() // Count comments on user's posts in the chosen month
+						.Where(c => _context.Blog.Any(b => b.BloggerId == u.Id && b.BlogId == c.BlogId) && c.CreatedAt >= startDate && c.CreatedAt <= endDate)
+						.Count()
 				})
-				.OrderByDescending(dto => dto.TotalPosts) // Order by total posts (or another metric)
+				.OrderByDescending(dto => dto.TotalPosts)
 				.Take(10)
 				.ToListAsync();
 
 			return Ok(topBloggers);
 		}
+
 
 
 		[HttpGet("top-bloggers-10")]
@@ -133,16 +135,21 @@ namespace Bislerium.Controllers
 				{
 					UserId = u.Id,
 					Username = u.UserName,
-					TotalPosts = _context.Blog.Count(b => b.BloggerId == u.Id), // Count posts by the user
-					TotalUpvotesReceived = _context.Reactions.Where(r => r.Blog.BloggerId == u.Id && r.Upvote).Count(), // Count upvotes on user's posts
-					TotalCommentsReceived = _context.Comments.Where(c => c.Blog.BloggerId == u.Id).Count() // Count comments on user's posts
+					TotalPosts = _context.Blog.Count(b => b.BloggerId == u.Id),
+					TotalUpvotesReceived = _context.Reactions
+						.Where(r => _context.Blog.Any(b => b.BlogId == r.BlogId && b.BloggerId == u.Id) && r.Upvote)
+						.Count(),
+					TotalCommentsReceived = _context.Comments
+						.Where(c => _context.Blog.Any(b => b.BlogId == c.BlogId && b.BloggerId == u.Id))
+						.Count()
 				})
-				.OrderByDescending(dto => dto.TotalPosts) // Order by total posts (or another metric)
+				.OrderByDescending(dto => dto.TotalPosts)
 				.Take(10)
 				.ToListAsync();
 
 			return Ok(topBloggers);
 		}
+
 
 
 

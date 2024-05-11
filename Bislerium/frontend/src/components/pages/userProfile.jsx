@@ -52,18 +52,23 @@ const UserProfile = () => {
     //blogId.preventDefault();
 
     try {
-      const response = await axios.delete(
-        `https://localhost:7274/api/User/DeleteUser`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      let answer = window.confirm("Do you want to proceed?");
+      if (answer) {
+        const response = await axios.delete(
+          `https://localhost:7274/api/User/DeleteUser`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      alert("User Deleted Sucessfully");
-      handleLogout();
-      navigate(0);
+        alert("User Deleted Sucessfully");
+        handleLogout();
+        navigate(0);
+      } else {
+        alert("User not deleted");
+      }
     } catch (error) {
       console.error(error.response);
       setError("User Not Deleted");
@@ -187,7 +192,7 @@ const UserProfile = () => {
                           </button>
                           <button
                             type="button"
-                            className="btn btn-outline-primary me-1 flex-grow-1"
+                            className="btn btn-outline-danger me-1 flex-grow-1"
                             onClick={() => handleDelete()}
                           >
                             Delete

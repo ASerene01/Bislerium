@@ -33,7 +33,7 @@ const Login = () => {
 
         setFormData({ userName: "", password: "" });
 
-        navigate("/");
+        navigate("/UserProfile");
         window.location.reload();
       } else {
         throw new Error("Login failed");

@@ -4,15 +4,20 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
-
+import { Dropdown } from "react-bootstrap";
+import TextInput from "../Common/TextInput";
 const IndividualBlog = () => {
   const { id } = useParams();
   const token = localStorage.getItem("token");
   const { user, isLoggedIn, handleLogout } = useAuth();
-
+  const [updateId, setUpdateId] = useState(null);
   const [newComment, setNewComment] = useState("");
   const [blogs, setBlogs] = useState({});
   const [comments, setComments] = useState([]);
+
+  const [updateData, setUpdateData] = useState({
+    comment: "",
+  });
   const navigate = useNavigate();
   useEffect(() => {
     const fetchBlog = async () => {
@@ -134,20 +139,28 @@ const IndividualBlog = () => {
     }
   };
 
-  const handleCommentEdit = async (commentId) => {
+  const handleCommentEdit = async (e) => {
+    e.preventDefault();
     try {
-      await axios.delete(
-        `https://localhost:7274/api/Comments/${commentId}`,
-        {},
+      const response = await axios.put(
+        `https://localhost:7274/api/Comments/${updateId}`,
+        {
+          content: updateData.comment,
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      navigate(0);
+      if (response.status === 200) {
+        navigate(0);
+      } else {
+        throw new Error("Update failed");
+      }
     } catch (error) {
-      console.error("Error liking comment:", error);
+      console.error(error.response);
+      alert("Update failed. Please try again later.");
     }
   };
 
@@ -196,10 +209,92 @@ const IndividualBlog = () => {
               style={{ backgroundColor: "#444", color: "#fff" }}
             >
               <div className="card-body">
-                <h5 className="card-title" style={{ color: "#ffc107" }}>
-                  {comment.firstName} {comment.lastName}
-                </h5>
-                <p className="card-text">{comment.content}</p>
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h5
+                      className="card-title"
+                      style={{ color: "#ffc107", marginBottom: "0" }}
+                    >
+                      {comment.firstName} {comment.lastName}
+                    </h5>
+                    <p className="card-text">{comment.content}</p>
+                  </div>
+                  {isLoggedIn && user.UserId === comment.userId && (
+                    <Dropdown>
+                      <Dropdown.Toggle variant="" id="dropdown-basic">
+                        <i className="bi bi-three-dots"></i>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        <Dropdown.Item
+                          data-bs-toggle="modal"
+                          data-bs-target="#updateModal"
+                          onClick={() => {
+                            setUpdateData({
+                              comment: comment.content,
+                            });
+                            setUpdateId(comment.commentId);
+                          }}
+                        >
+                          Edit
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          onClick={() => handleCommentDelete(comment.commentId)}
+                        >
+                          Delete
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  )}
+                </div>
+                <div
+                  className="modal fade"
+                  id="updateModal"
+                  tabIndex="-1"
+                  aria-labelledby="exampleModalLabel"
+                  aria-hidden="true"
+                >
+                  <div className="modal-dialog modal-lg">
+                    {" "}
+                    {/* Added modal-lg class */}
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h1 className="modal-title fs-5" id="exampleModalLabel">
+                          Edit Comment
+                        </h1>
+                        <button
+                          type="button"
+                          className="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <form onSubmit={handleCommentEdit}>
+                        <div className="modal-body">
+                          <div className="mb-3">
+                            <TextInput
+                              type="text"
+                              name="title"
+                              value={updateData.comment}
+                              onChange={(e) =>
+                                setUpdateData({
+                                  ...updateData,
+                                  comment: e.target.value,
+                                })
+                              }
+                              placeholder="Title"
+                            />
+                          </div>
+                        </div>
+                        <div className="modal-footer">
+                          <button className="btn btn-primary">
+                            Update Comment
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
                 {isLoggedIn && (
                   <div className="d-flex">
                     <button
@@ -209,32 +304,13 @@ const IndividualBlog = () => {
                     >
                       <i className="bi bi-hand-thumbs-up"></i> Like
                     </button>
-
                     <button
-                      className="btn btn-sm btn-outline-danger me-2"
+                      className="btn btn-sm btn-outline-danger"
                       onClick={() => handleDislike(comment.commentId)}
                       style={{ width: "80px" }}
                     >
                       <i className="bi bi-hand-thumbs-down"></i> Dislike
                     </button>
-                    {isLoggedIn && user.UserId == comment.userId && (
-                      <>
-                        <button
-                          className="btn btn-sm btn-outline-success me-2"
-                          onClick={() => handleCommentEdit(comment.commentId)}
-                          style={{ width: "80px" }}
-                        >
-                          <i className="bi bi-pen"></i> Edit
-                        </button>
-                        <button
-                          className="btn btn-sm btn-outline-danger me-2"
-                          onClick={() => handleCommentDelete(comment.commentId)}
-                          style={{ width: "80px" }}
-                        >
-                          <i className="bi bi-trash"></i> Delete
-                        </button>
-                      </>
-                    )}
                   </div>
                 )}
               </div>

@@ -11,6 +11,7 @@ using Bislerium.Models;
 using NuGet.Protocol.Core.Types;
 using Bislerium.Interfaces;
 using Bislerium.Services;
+using System.Reflection.Metadata;
 
 namespace Bislerium.Controllers
 {
@@ -33,16 +34,17 @@ namespace Bislerium.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutComment(int id, Comment comment)
         {
-            if (id != comment.CommentId)
-            {
-                return BadRequest();
-            }
 
-            _context.Entry(comment).State = EntityState.Modified;
+			var existingComment = await _context.Comments.FindAsync(id);
+			// Update the properties of the existing user with the values from the updatedUser
+			existingComment.Content = comment.Content ?? existingComment.Content;
+			
+			_context.Entry(existingComment).State = EntityState.Modified;
 
             try
             {
                 await _context.SaveChangesAsync();
+				return Ok();
             }
             catch (DbUpdateConcurrencyException)
             {

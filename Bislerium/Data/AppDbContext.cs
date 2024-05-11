@@ -25,10 +25,12 @@ namespace Bislerium.Data
 
             // Seed roles
             modelBuilder.Entity<IdentityRole>().HasData(
-                new IdentityRole { Id = "1", Name = "Admins", NormalizedName = "ADMINS" },
+                new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" },
                 new IdentityRole { Id = "2", Name = "Blogger", NormalizedName = "BLOGGER" },
                 new IdentityRole { Id = "3", Name = "Surfer", NormalizedName = "SURFER" }
+                
             );
+         
         }
 
     }

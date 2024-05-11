@@ -134,7 +134,6 @@ const Home = () => {
 
   return (
     <div className="container mt-5">
-      <h1 className="mb-4 text-primary">Welcome to Bislerium Blogs</h1>
       // Updated Dropdown Section with Right-Aligned Dropdown
       <div className="dropdown show d-flex justify-content-end">
         <select
@@ -174,14 +173,14 @@ const Home = () => {
                   {isLoggedIn && (
                     <div className="d-flex">
                       <button
-                        className="post-btn me-2"
+                        className="btn btn-outline-primary me-2"
                         onClick={() => handleLike(blog.blogId)}
                       >
                         {blog.upvote}
                         <i className="bi bi-hand-thumbs-up"></i>
                       </button>
                       <button
-                        className="dislike-btn"
+                        className="btn btn-outline-danger"
                         onClick={() => handleDislike(blog.blogId)}
                       >
                         {blog.downvote}

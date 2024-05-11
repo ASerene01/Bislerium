@@ -39,7 +39,7 @@ const UserBlog = () => {
             },
           }
         );
-        
+
         setBlogs(response.data);
       } catch (error) {
         console.error("Error fetching blogs:", error);
@@ -121,11 +121,6 @@ const UserBlog = () => {
       );
 
       if (response.status === 200) {
-        setUpdateData({
-          title: "",
-          body: "",
-        });
-
         navigate(0);
       } else {
         throw new Error("Update failed");
@@ -136,113 +131,97 @@ const UserBlog = () => {
     }
   };
 
-  const handleUpdateId = (blogId) => {
-    setUpdateId(blogId);
-  };
+  const handleUpdateId = (blogId) => {};
 
   return (
     <div className="container mt-5">
-      <h1 className="mb-4 text-primary">Hello to your blog</h1>
-
-      <div className="d-flex justify-content-between align-items-center">
+      <div className="d-flex justify-content-end align-items-right">
         <button
           type="button"
-          className="btn btn-sm btn-primary me-auto" // Added btn-sm and me-auto classes
+          className="btn btn-sm btn-success"
+          style={{ maxWidth: "150px" }} // Set a maximum width for the button
           data-bs-toggle="modal"
           data-bs-target="#exampleModal"
         >
           Add Blog
         </button>
-      </div>
-      <hr className="bg-primary" />
-
-      {/* Add Blog Modal */}
-      <div
-        className="modal fade"
-        id="exampleModal"
-        tabIndex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Add Blog
-              </h1>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
+        {/* Add Blog Modal */}
+        <div
+          className="modal fade"
+          id="exampleModal"
+          tabIndex="-1"
+          aria-labelledby="exampleModalLabel"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-lg">
+            {" "}
+            {/* Added modal-lg class */}
+            <div className="modal-content">
+              <div className="modal-header">
+                <h1 className="modal-title fs-5" id="exampleModalLabel">
+                  Add Blog
+                </h1>
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <form onSubmit={handleSubmit}>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <TextInput
+                      type="text"
+                      name="title"
+                      value={formData.title}
+                      onChange={handleChange}
+                      placeholder="Title"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <textarea
+                      className="form-control"
+                      name="body"
+                      value={formData.body}
+                      onChange={handleChange}
+                      placeholder="Body"
+                      rows="5"
+                    ></textarea>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button className="btn btn-primary">Add Blog</button>
+                </div>
+              </form>
             </div>
-            <form onSubmit={handleSubmit}>
-              <div className="modal-body">
-                <div className="mb-3">
-                  <TextInput
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    placeholder="Title"
-                  />
-                </div>
-                <div className="mb-3">
-                  <textarea
-                    className="form-control"
-                    name="body"
-                    value={formData.body}
-                    onChange={handleChange}
-                    placeholder="Body"
-                    rows="3"
-                  ></textarea>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button className="btn btn-primary">Add Blog</button>
-              </div>
-            </form>
           </div>
         </div>
       </div>
-
-      {/* Display Blogs */}
+      <hr className="bg-primary" />
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {blogs.map((blog) => (
           <div key={blog.blogId} className="col">
             <div className="card h-100">
+              <img
+                src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"
+                className="card-img-top"
+                alt={blog.title}
+              />
               <div className="card-body">
                 <h2 className="card-title">{blog.title}</h2>
-
-                <div className="d-flex justify-content-between align-items-center mt-3">
-                  <div>
-                    <small className="me-2">Author: {blog.author}</small>
-                    <small>
-                      Published: {new Date(blog.createdAt).toLocaleDateString()}
-                    </small>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      data-bs-toggle="modal"
-                      data-bs-target="#updateModal"
-                      onClick={() => handleUpdateId(blog.blogId)}
-                    >
-                      Update Blog
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-danger mt-4"
-                      onClick={() => handleDelete(blog.blogId)}
-                    >
-                      Delete Blog
-                    </button>
-                  </div>
-                  <div></div>
-                </div>
+                <div className="d-flex justify-content-between align-items-center mt-3"></div>
                 <hr className="mt-3 mb-2" />
-
-                <div className="mt-3">
+                <div>
+                  <small className="me-2">
+                    Blog Score: {blog.blogPopularity}
+                  </small>
+                </div>
+                <small>
+                  Published: {new Date(blog.createdAt).toLocaleDateString()}
+                </small>
+                <hr className="mt-3 mb-2" />
+                <div className="mt-3 mb-2">
                   <Link
                     to={`/individualBlog/${blog.blogId}`}
                     className="btn btn-primary"
@@ -250,64 +229,103 @@ const UserBlog = () => {
                     View Blog
                   </Link>
                 </div>
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    className="btn btn-success me-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#updateModal"
+                    onClick={() => {
+                      setUpdateId(blog.blogId);
+                      setUpdateData({
+                        title: blog.title,
+                        body: blog.body,
+                      });
+                    }}
+                    style={{ maxWidth: "120px" }} // Set a maximum width for the button
+                  >
+                    Update Blog
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={() => handleDelete(blog.blogId)}
+                    style={{ maxWidth: "120px" }} // Set a maximum width for the button
+                  >
+                    Delete Blog
+                  </button>
+                  {/* Update Blog Modal */}
+                  <div
+                    className="modal fade"
+                    id="updateModal"
+                    tabIndex="-1"
+                    aria-labelledby="exampleModalLabel"
+                    aria-hidden="true"
+                  >
+                    <div className="modal-dialog modal-lg">
+                      {" "}
+                      {/* Added modal-lg class */}
+                      <div className="modal-content">
+                        <div className="modal-header">
+                          <h1
+                            className="modal-title fs-5"
+                            id="exampleModalLabel"
+                          >
+                            Update Blog
+                          </h1>
+                          <button
+                            type="button"
+                            className="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                          ></button>
+                        </div>
+                        <form onSubmit={handleUpdateSubmit}>
+                          <div className="modal-body">
+                            <div className="mb-3">
+                              <TextInput
+                                type="text"
+                                name="title"
+                                value={updateData.title}
+                                onChange={(e) =>
+                                  setUpdateData({
+                                    ...updateData,
+                                    title: e.target.value,
+                                  })
+                                }
+                                placeholder="Title"
+                              />
+                            </div>
+                            <div className="mb-3">
+                              <textarea
+                                className="form-control"
+                                name="body"
+                                value={updateData.body}
+                                onChange={(e) =>
+                                  setUpdateData({
+                                    ...updateData,
+                                    body: e.target.value,
+                                  })
+                                }
+                                placeholder="Body"
+                                rows="5"
+                              ></textarea>
+                            </div>
+                          </div>
+                          <div className="modal-footer">
+                            <button className="btn btn-primary">
+                              Update Blog
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Update Blog Modal */}
-      <div
-        className="modal fade"
-        id="updateModal"
-        tabIndex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Update Blog
-              </h1>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <form onSubmit={handleUpdateSubmit}>
-              <div className="modal-body">
-                <div className="mb-3">
-                  <TextInput
-                    type="text"
-                    name="title"
-                    value={updateData.title}
-                    onChange={(e) =>
-                      setUpdateData({ ...updateData, title: e.target.value })
-                    }
-                    placeholder="Title"
-                  />
-                </div>
-                <div className="mb-3">
-                  <TextInput
-                    type="text"
-                    name="body"
-                    value={updateData.body}
-                    onChange={(e) =>
-                      setUpdateData({ ...updateData, body: e.target.value })
-                    }
-                    placeholder="Body"
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button className="btn btn-primary">Update Blog</button>
-              </div>
-            </form>
-          </div>
-        </div>
       </div>
     </div>
   );

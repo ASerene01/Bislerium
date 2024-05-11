@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../Auth/AuthContext";
 import TextInput from "../Common/TextInput";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const UserBlog = () => {
   const [blogs, setBlogs] = useState([]);
@@ -140,18 +141,21 @@ const UserBlog = () => {
   const handleUpdateFile = (e) => {
     if (e.target.files && e.target.files[0]) {
       let imageFile = e.target.files[0];
+      if (imageFile.size > 5e6) {
+        alert("File Size is greated than 5 mb");
+      } else {
+        const reader = new FileReader();
+        reader.onload = (x) => {
+          setFormData({
+            ...formData,
+            imageName: imageFile.name,
+            imageFile: imageFile,
+            imageSrc: x.target.result,
+          });
+        };
 
-      const reader = new FileReader();
-      reader.onload = (x) => {
-        setFormData({
-          ...formData,
-          imageName: imageFile.name,
-          imageFile: imageFile,
-          imageSrc: x.target.result,
-        });
-      };
-
-      reader.readAsDataURL(imageFile);
+        reader.readAsDataURL(imageFile);
+      }
     }
   };
 

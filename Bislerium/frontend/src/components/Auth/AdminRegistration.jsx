@@ -1,10 +1,11 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import TextInput from "../Common/TextInput";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
-const Register = () => {
+const AdminRegister = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -22,10 +23,6 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    //if (formData.password !== formData.confirmPassword) {
-    //    return Response.json({message: "password didnt match"})
-
-    //}
 
     try {
       // Make a POST request to the registration endpoint
@@ -38,7 +35,7 @@ const Register = () => {
           password: formData.password,
           email: formData.email,
           phoneNumber: formData.phoneNumber,
-          role: "Blogger",
+          role: "Admin",
         }
       );
       console.log(response.status);
@@ -54,7 +51,7 @@ const Register = () => {
           phoneNumber: "",
         });
         // Show success message
-        alert("Registration successful! You can now log in.");
+        toast("Registration successful! You can now log in.");
         // Redirect to the login page
         navigate("/login");
       } else {
@@ -141,16 +138,10 @@ const Register = () => {
               Register
             </button>
           </form>
-          <div class="mt-2 reset-text">
-            Already have an account?{" "}
-            <Link to="/login" class="ml-2">
-              Log in
-            </Link>
-          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default Register;
+export default AdminRegister;

@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import UserProfile from "./components/pages/userProfile";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import AdminRegister from "./components/Auth/AdminRegistration";
 const App = () => {
   // const { user, isLoggedIn, handleLogout } = useAuth();
   // const navigate = useNavigate();
@@ -37,11 +38,11 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/" element={<Home />} />
-            {/* <Route path="/pages/blog" element={<Blog />} /> */}
             <Route path="/individualBlog/:id" element={<IndividualBlog />} />
             <Route path="/UserBlog/:userId" element={<UserBlog />} />
             <Route path="/Dashboard" element={<Dashboard />} />
             <Route path="/UserProfile" element={<UserProfile />} />
+            <Route path="/AdminRegister" element={<AdminRegister />} />
           </Routes>
           <ToastContainer position="bottom-left" />
         </div>

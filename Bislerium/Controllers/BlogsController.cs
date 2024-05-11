@@ -318,16 +318,16 @@ namespace Bislerium.Controllers
 			try
 			{
 				var activeBlogs = await _context.Blog.Include(blog => blog.User) // Include the User navigation property
-												  .OrderByDescending(blog => blog.BlogPopularity) // Order by Popularity (highest to lowest)
-												  .Select(blog => new
-												  {
-													  blog.BlogId,
-													  blog.Title,
-													  blog.Body,
-													  blog.CreatedAt,
-                                                      blog.BlogPopularity,
-												  })
-												  .ToListAsync();
+					.OrderByDescending(blog => blog.BlogPopularity) // Order by Popularity (highest to lowest)
+					.Select(blog => new
+					{
+						blog.BlogId,
+						blog.Title,
+						blog.Body,
+						blog.CreatedAt,
+                        blog.BlogPopularity,
+					})
+					.ToListAsync();
 
 				return Ok(activeBlogs); // Return the list of active blogs by popularity with user details
 			}
@@ -353,16 +353,16 @@ namespace Bislerium.Controllers
 			try
 			{
 				var activeBlogs = await _context.Blog.Include(blog => blog.User) // Include the User navigation property
-											  .OrderBy(o => Guid.NewGuid()) // Order by Popularity (highest to lowest)
-											  .Select(blog => new
-											  {
-												  blog.BlogId,
-												  blog.Title,
-												  blog.Body,
-												  blog.CreatedAt,
-												  blog.BlogPopularity,
-											  })
-											  .ToListAsync();
+					.OrderBy(o => Guid.NewGuid()) // Order by Popularity (highest to lowest)
+					.Select(blog => new
+					{
+						blog.BlogId,
+						blog.Title,
+						blog.Body,
+						blog.CreatedAt,
+						blog.BlogPopularity,
+					})
+					.ToListAsync();
 
 				return Ok(activeBlogs); // Return the list of random active blogs with user details
 			}

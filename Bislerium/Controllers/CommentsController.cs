@@ -127,6 +127,15 @@ namespace Bislerium.Controllers
 			return Ok(); // Return 200 OK if the comment was added successfully
 		}
 
+
+		[HttpGet("downvoteCount/{commentId}")]
+		public async Task<ActionResult> GetDownVote(int commentId)
+		{
+
+			int downvote = _context.CommentReactions.Count(r => r.CommentId == commentId && r.Downvote);
+			return Ok(downvote);
+		}
+
 		[HttpPost("{commentId}/upvote")]
 		public async Task<ActionResult> Upvote(int commentId)
 		{
@@ -173,6 +182,17 @@ namespace Bislerium.Controllers
 			await _context.SaveChangesAsync();
 
 			return Ok(); // Return 200 OK if the comment was added successfully
+		}
+
+		[HttpGet("upvoteCount/{commentId}")]
+		public async Task<ActionResult> GetUpvoteCount(int commentId)
+		{
+
+			int upvotes = _context.CommentReactions.Count(r => r.CommentId == commentId && r.Upvote);
+
+
+
+			return Ok(upvotes);
 		}
 
 		private bool CommentExists(int id)

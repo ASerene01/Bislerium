@@ -6,6 +6,7 @@ import { useAuth } from "../Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import TextInput from "../Common/TextInput";
+import { toast } from "react-toastify";
 const IndividualBlog = () => {
   const { id } = useParams();
   const token = localStorage.getItem("token");
@@ -59,7 +60,52 @@ const IndividualBlog = () => {
             }
           })
         );
-        setComments(updatedComments);
+        const newUpdatedCommentsAfterUpvote = await Promise.all(
+          updatedComments.map(async (comment) => {
+            try {
+              const upvoteCountResponse = await axios.get(
+                `https://localhost:7274/api/Comments/upvoteCount/${comment.commentId}`
+              );
+
+              const updatedComment = {
+                ...comment,
+                upvote: upvoteCountResponse.data, // Set likes to fetched like count
+              };
+
+              return updatedComment;
+            } catch (error) {
+              console.error(
+                `Error fetching like count for blog ID ${comment.commentId}:`,
+                error
+              );
+              return comment; // Return original blog in case of error
+            }
+          })
+        );
+        const newUpdatedCommentsAfterDownvote = await Promise.all(
+          newUpdatedCommentsAfterUpvote.map(async (comment) => {
+            try {
+              const downvoteCountResponse = await axios.get(
+                `https://localhost:7274/api/Comments/downvoteCount/${comment.commentId}`
+              );
+
+              const updatedComment = {
+                ...comment,
+                downvote: downvoteCountResponse.data, // Set likes to fetched like count
+              };
+
+              return updatedComment;
+            } catch (error) {
+              console.error(
+                `Error fetching like count for blog ID ${comment.commentId}:`,
+                error
+              );
+              return comment; // Return original blog in case of error
+            }
+          })
+        );
+
+        setComments(newUpdatedCommentsAfterDownvote);
       } catch (error) {
         console.error("Error fetching comments:", error);
       }
@@ -102,6 +148,8 @@ const IndividualBlog = () => {
           },
         }
       );
+
+      navigate(0);
     } catch (error) {
       console.error("Error liking comment:", error);
     }
@@ -118,6 +166,7 @@ const IndividualBlog = () => {
           },
         }
       );
+      navigate(0);
     } catch (error) {
       console.error("Error disliking comment:", error);
     }
@@ -135,7 +184,7 @@ const IndividualBlog = () => {
       );
       navigate(0);
     } catch (error) {
-      console.error("Error liking comment:", error);
+      console("Error liking comment:", error);
     }
   };
 
@@ -160,7 +209,7 @@ const IndividualBlog = () => {
       }
     } catch (error) {
       console.error(error.response);
-      alert("Update failed. Please try again later.");
+      toast("Update failed. Please try again later.");
     }
   };
 
@@ -302,6 +351,7 @@ const IndividualBlog = () => {
                       onClick={() => handleLike(comment.commentId)}
                       style={{ width: "80px" }}
                     >
+                      {comment.upvote}
                       <i className="bi bi-hand-thumbs-up"></i> Like
                     </button>
                     <button
@@ -309,6 +359,7 @@ const IndividualBlog = () => {
                       onClick={() => handleDislike(comment.commentId)}
                       style={{ width: "80px" }}
                     >
+                      {comment.downvote}
                       <i className="bi bi-hand-thumbs-down"></i> Dislike
                     </button>
                   </div>

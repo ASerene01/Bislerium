@@ -51,7 +51,6 @@ const UserBlog = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const response = await axios.post(
         "https://localhost:7274/api/Blogs",
@@ -82,8 +81,6 @@ const UserBlog = () => {
     }
   };
   const handleDelete = async (blogId) => {
-    //blogId.preventDefault();
-
     try {
       const response = await axios.delete(
         `https://localhost:7274/api/Blogs/${blogId}`,
@@ -130,8 +127,6 @@ const UserBlog = () => {
       setError("Update failed. Please try again later.");
     }
   };
-
-  const handleUpdateId = (blogId) => {};
 
   return (
     <div className="container mt-5">

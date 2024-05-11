@@ -51,6 +51,9 @@ const Navbar = () => {
                   <Link className="nav-link btn btn-link" to="/UserProfile">
                     UserProfile
                   </Link>
+                  <Link className="nav-link btn btn-link" to="/AdminRegister">
+                    RegisterAdmin
+                  </Link>
                   <a className="nav-link btn btn-link" onClick={handleLogout}>
                     Logout
                   </a>
